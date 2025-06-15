@@ -46,24 +46,8 @@
           // Ensure a specific origin is used in production for security
           // For development, '*' might be okay, but the plan implies a specific FRONTEND_URL
           // and is passed as the 'origin' parameter to this page.
-          // DEBUGGING: Display info and prevent auto-close
-          document.body.innerHTML = `
-            <div class="container">
-              <h1>Debug Info</h1>
-              <p><strong>Token:</strong> ${token ? token.substring(0, 20) + '...' : 'NOT FOUND'}</p>
-              <p><strong>Origin Param:</strong> ${origin}</p>
-              <p><strong>Message Sent:</strong> ${message}</p>
-              <p><strong>Target Origin for postMessage:</strong> ${origin}</p>
-              <p>Attempting postMessage now...</p>
-            </div>
-          `;
-          if (window.opener) {
-            window.opener.postMessage(message, origin);
-            // document.body.innerHTML += "<p>postMessage attempted. Window will NOT close automatically for debugging.</p>";
-          } else {
-            document.body.innerHTML += "<p style='color:red;'>ERROR: window.opener is NULL!</p>";
-          }
-          // window.close(); // Prevent closing for debug
+          window.opener.postMessage(message, origin);
+          window.close();
         } else {
           console.error("No opener window found. Cannot post message.");
           document.body.innerHTML =

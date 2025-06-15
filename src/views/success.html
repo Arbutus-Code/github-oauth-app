@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Authentication Success</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f0f0f0;
+        color: #333;
+        text-align: center;
+      }
+      .container {
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #4caf50;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Success!</h1>
+      <p>Authentication successful. This window will now close.</p>
+    </div>
+    <script>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get("token");
+        const origin = params.get("origin") || "*"; // Default to '*' if origin not specified, though it should be
+        const provider = "github"; // As per current setup
+
+        if (window.opener) {
+          const message = {
+            type: "authorization_response",
+            token: token,
+            provider: provider,
+          };
+          // Ensure a specific origin is used in production for security
+          // For development, '*' might be okay, but the plan implies a specific FRONTEND_URL
+          window.opener.postMessage(message, origin);
+          window.close();
+        } else {
+          console.error("No opener window found. Cannot post message.");
+          document.body.innerHTML =
+            '<div class="container"><h1>Error</h1><p>Could not communicate with the main application window. Please close this window and try again.</p></div>';
+        }
+      })();
+    </script>
+  </body>
+</html>

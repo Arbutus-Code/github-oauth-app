@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Authentication Error</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f0f0f0;
+        color: #333;
+        text-align: center;
+      }
+      .container {
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #f44336;
+      }
+      .error-message {
+        margin-top: 15px;
+        color: #757575;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Authentication Error</h1>
+      <p id="errorMessage" class="error-message">An unknown error occurred.</p>
+      <p>Please close this window and try again.</p>
+    </div>
+    <script>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        const error = params.get("error") || "An unspecified error occurred.";
+        const origin = params.get("origin") || "*";
+        const provider = "github";
+
+        document.getElementById("errorMessage").textContent =
+          decodeURIComponent(error);
+
+        if (window.opener) {
+          const message = {
+            type: "authorization_response",
+            error: decodeURIComponent(error),
+            provider: provider,
+          };
+          window.opener.postMessage(message, origin);
+          // Consider not auto-closing on error to allow user to read message,
+          // or provide a button to close.
+          // For now, matching previous behavior of auto-close.
+          // window.close();
+        } else {
+          console.error("No opener window found. Cannot post message.");
+        }
+      })();
+    </script>
+  </body>
+</html>

@@ -40,13 +40,12 @@
         const provider = "github"; // As per current setup
 
         if (window.opener) {
-          const message = {
-            type: "authorization_response",
-            token: token,
-            provider: provider,
-          };
+          const jsonData = JSON.stringify({ token: token, provider: provider });
+          const message = `authorization:${provider}:success:${jsonData}`;
+
           // Ensure a specific origin is used in production for security
           // For development, '*' might be okay, but the plan implies a specific FRONTEND_URL
+          // and is passed as the 'origin' parameter to this page.
           window.opener.postMessage(message, origin);
           window.close();
         } else {

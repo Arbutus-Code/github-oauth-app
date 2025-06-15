@@ -29,8 +29,13 @@
   </head>
   <body>
     <div class="container">
-      <h1>Success!</h1>
-      <p>Authentication successful. This window will now close.</p>
+      <h1>Success! (Debug Mode)</h1>
+      <p id="status-message">Attempting to send authentication details...</p>
+      <div style="text-align: left; margin-top: 20px;">
+        <p><strong>Token:</strong> <code id="token-display"></code></p>
+        <p><strong>Target Origin:</strong> <code id="origin-display"></code></p>
+        <p><strong>Full Message:</strong> <code id="message-display"></code></p>
+      </div>
     </div>
     <script>
       (function () {
@@ -46,12 +51,21 @@
           // Ensure a specific origin is used in production for security
           // For development, '*' might be okay, but the plan implies a specific FRONTEND_URL
           // and is passed as the 'origin' parameter to this page.
+          // Display the data being sent
+          document.getElementById('token-display').textContent = token || 'Not found';
+          document.getElementById('origin-display').textContent = origin || 'Not found';
+          document.getElementById('message-display').textContent = message || 'Not found';
+
           window.opener.postMessage(message, origin);
-          window.close();
+          // window.close(); // Keep window open for debugging
+
+          document.getElementById('status-message').textContent = 'Message sent. This window will remain open for debugging.';
         } else {
           console.error("No opener window found. Cannot post message.");
-          document.body.innerHTML =
-            '<div class="container"><h1>Error</h1><p>Could not communicate with the main application window. Please close this window and try again.</p></div>';
+          document.getElementById('status-message').textContent = 'Error: No opener window found. Cannot post message.';
+          document.getElementById('token-display').textContent = 'N/A';
+          document.getElementById('origin-display').textContent = 'N/A';
+          document.getElementById('message-display').textContent = 'N/A';
         }
       })();
     </script>

@@ -41,25 +41,41 @@
       (function () {
         const params = new URLSearchParams(window.location.search);
         const token = params.get("token");
-        const origin = params.get("origin") || "*"; // Default to '*' if origin not specified, though it should be
+        const origin = params.get("origin") || "*"; // Should be https://jekyll.arbutuscode.ca
         const provider = "github"; // As per current setup
 
-        if (window.opener) {
-          const jsonData = JSON.stringify({ token: token, provider: provider });
-          const message = `authorization:${provider}:success:${jsonData}`;
+        // Display details on the page
+        document.getElementById("token-display").textContent = token || "Not found";
+        document.getElementById("origin-display").textContent = origin;
+        document.getElementById("status-message").textContent = "Processing authentication details...";
 
-          // Ensure a specific origin is used in production for security
-          // For development, '*' might be okay, but the plan implies a specific FRONTEND_URL
-          // and is passed as the 'origin' parameter to this page.
-          // Display the data being sent
-          document.getElementById('token-display').textContent = token || 'Not found';
-          document.getElementById('origin-display').textContent = origin || 'Not found';
-          document.getElementById('message-display').textContent = message || 'Not found';
+        if (token && origin !== "*") {
+          if (window.opener) {
+            const jsonData = JSON.stringify({ token: token, provider: provider });
+            const message = `authorization:${provider}:success:${jsonData}`;
+            
+            document.getElementById("message-display").textContent = message;
+            document.getElementById("status-message").textContent = "Attempting to send authentication details to opener...";
 
-          window.opener.postMessage(message, origin);
-          // window.close(); // Keep window open for debugging
+            // Explicit console logging in the popup
+            console.log("[OAuth Success Page] Token:", token);
+            console.log("[OAuth Success Page] Target Origin:", origin);
+            console.log("[OAuth Success Page] Provider:", provider);
+            console.log("[OAuth Success Page] Full message to post:", message);
 
-          document.getElementById('status-message').textContent = 'Message sent. This window will remain open for debugging.';
+            try {
+              window.opener.postMessage(message, origin);
+              document.getElementById("status-message").textContent = "Authentication details SENT to opener. Target origin: " + origin + ". You can manually close this window if it doesn't close automatically (auto-close is temporarily disabled for debugging).";
+              console.log("[OAuth Success Page] postMessage sent successfully to origin:", origin);
+              // window.close(); // Temporarily commented out for debugging
+            } catch (e) {
+              document.getElementById("status-message").textContent = "ERROR sending details: " + e.message;
+              console.error("[OAuth Success Page] Error during postMessage:", e);
+            }
+          } else {
+            document.getElementById("status-message").textContent = "ERROR: window.opener is not available. Cannot send details.";
+            console.error("[OAuth Success Page] window.opener is not available.");
+          }
         } else {
           console.error("No opener window found. Cannot post message.");
           document.getElementById('status-message').textContent = 'Error: No opener window found. Cannot post message.';

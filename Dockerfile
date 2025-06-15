@@ -6,7 +6,8 @@ WORKDIR /app
 # Install dependencies
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./ 
 # Prefer pnpm if lock file exists, then yarn, then npm
-RUN if [ -f pnpm-lock.yaml ]; then npm install -g pnpm && pnpm install --frozen-lockfile; \
+RUN --mount=type=cache,target=/root/.npm \
+    if [ -f pnpm-lock.yaml ]; then npm install -g pnpm && pnpm install --frozen-lockfile; \
     elif [ -f yarn.lock ]; then yarn install --frozen-lockfile; \
     else npm ci; \
     fi
@@ -41,6 +42,8 @@ USER appuser
 EXPOSE 3000
 
 # Add a healthcheck
+# Install wget for the healthcheck command
+RUN apk add --no-cache wget
 # Note: wget might not be available by default in alpine if not installed.
 # If healthcheck fails due to wget, consider adding 'RUN apk add --no-cache wget'
 # or using a Node.js based healthcheck script.

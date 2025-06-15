@@ -39,10 +39,14 @@
     </div>
     <script>
       (function () {
+        if (window.opener) {
+          window.opener.postMessage("authorizing:github", "*");
+        }
+
         const params = new URLSearchParams(window.location.search);
         const token = params.get("token");
-        const origin = params.get("origin") || "*"; // Should be https://jekyll.arbutuscode.ca
-        const provider = "github"; // As per current setup
+        const origin = params.get("origin") || "*";
+        const provider = "github";
 
         // Display details on the page
         document.getElementById("token-display").textContent = token || "Not found";

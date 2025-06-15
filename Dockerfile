@@ -35,6 +35,9 @@ COPY --chown=appuser:appgroup package.json ./
 # Set environment variables
 ENV NODE_ENV=production
 
+# Install wget for the healthcheck command before switching user
+RUN apk add --no-cache wget
+
 # Switch to the non-root user
 USER appuser
 
@@ -42,8 +45,6 @@ USER appuser
 EXPOSE 3000
 
 # Add a healthcheck
-# Install wget for the healthcheck command
-RUN apk add --no-cache wget
 # Note: wget might not be available by default in alpine if not installed.
 # If healthcheck fails due to wget, consider adding 'RUN apk add --no-cache wget'
 # or using a Node.js based healthcheck script.

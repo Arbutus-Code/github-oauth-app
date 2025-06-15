@@ -28,7 +28,7 @@ WORKDIR /app
 # Copy built application and production dependencies
 # Ensure files are owned by the non-root user
 COPY --from=builder --chown=appuser:appgroup /app/dist ./dist
-COPY --from=builder --chown=appuser:appgroup /app/src/views ./src/views
+COPY --from=builder --chown=appuser:appgroup /app/src/views ./dist/views
 COPY --from=builder --chown=appuser:appgroup /app/node_modules ./node_modules
 COPY --chown=appuser:appgroup package.json ./
 

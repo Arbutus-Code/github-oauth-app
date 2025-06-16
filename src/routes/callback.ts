@@ -153,7 +153,7 @@ export default async function callbackRoutes(server: FastifyInstance) {
           reply.redirect(`/error?${errorParams.toString()}`);
         }
       } catch (err: unknown) {
-        let callbackErrorMessage =
+        const callbackErrorMessage =
           "An internal error occurred during callback processing.";
         if (err instanceof Error) {
           server.log.error(

@@ -29,18 +29,14 @@
   </head>
   <body>
     <div class="container">
-      <h1>Success! (Debug Mode)</h1>
-      <p id="status-message">Attempting to send authentication details...</p>
-      <div style="text-align: left; margin-top: 20px;">
-        <p><strong>Token:</strong> <code id="token-display"></code></p>
-        <p><strong>Target Origin:</strong> <code id="origin-display"></code></p>
-        <p><strong>Full Message:</strong> <code id="message-display"></code></p>
-      </div>
+      <h1>Success!</h1>
+      <p id="status-message">Processing authentication...</p>
     </div>
     <script>
       (function () {
+        // Initial message to opener, useful for some CMS setups
         if (window.opener) {
-          window.opener.postMessage("authorizing:github", "*");
+          window.opener.postMessage("authorizing:github", "*"); // Keep this as it was part of the fix
         }
 
         const params = new URLSearchParams(window.location.search);
@@ -48,44 +44,54 @@
         const origin = params.get("origin") || "*";
         const provider = "github";
 
-        // Display details on the page
-        document.getElementById("token-display").textContent = token || "Not found";
-        document.getElementById("origin-display").textContent = origin;
-        document.getElementById("status-message").textContent = "Processing authentication details...";
+        const statusMessageEl = document.getElementById("status-message");
 
         if (token && origin !== "*") {
           if (window.opener) {
-            const jsonData = JSON.stringify({ token: token, provider: provider });
+            const jsonData = JSON.stringify({
+              token: token,
+              provider: provider,
+            });
             const message = `authorization:${provider}:success:${jsonData}`;
-            
-            document.getElementById("message-display").textContent = message;
-            document.getElementById("status-message").textContent = "Attempting to send authentication details to opener...";
-
-            // Explicit console logging in the popup
-            console.log("[OAuth Success Page] Token:", token);
-            console.log("[OAuth Success Page] Target Origin:", origin);
-            console.log("[OAuth Success Page] Provider:", provider);
-            console.log("[OAuth Success Page] Full message to post:", message);
 
             try {
               window.opener.postMessage(message, origin);
-              document.getElementById("status-message").textContent = "Authentication details SENT to opener. Target origin: " + origin + ". You can manually close this window if it doesn't close automatically (auto-close is temporarily disabled for debugging).";
-              console.log("[OAuth Success Page] postMessage sent successfully to origin:", origin);
-              // window.close(); // Temporarily commented out for debugging
+              if (statusMessageEl)
+                statusMessageEl.textContent =
+                  "Authentication successful. Closing window...";
+              window.close();
             } catch (e) {
-              document.getElementById("status-message").textContent = "ERROR sending details: " + e.message;
-              console.error("[OAuth Success Page] Error during postMessage:", e);
+              if (statusMessageEl)
+                statusMessageEl.textContent =
+                  "Error sending authentication details to the main window.";
+              console.error(
+                "[OAuth Success Page] Error during postMessage:",
+                e,
+              );
             }
           } else {
-            document.getElementById("status-message").textContent = "ERROR: window.opener is not available. Cannot send details.";
-            console.error("[OAuth Success Page] window.opener is not available.");
+            if (statusMessageEl)
+              statusMessageEl.textContent =
+                "Error: Cannot find the main window to send authentication details.";
+            console.error(
+              "[OAuth Success Page] window.opener is not available.",
+            );
           }
         } else {
-          console.error("No opener window found. Cannot post message.");
-          document.getElementById('status-message').textContent = 'Error: No opener window found. Cannot post message.';
-          document.getElementById('token-display').textContent = 'N/A';
-          document.getElementById('origin-display').textContent = 'N/A';
-          document.getElementById('message-display').textContent = 'N/A';
+          let errorMsg = "Error: Authentication failed.";
+          if (!token) {
+            errorMsg = "Error: Authentication token not found.";
+          } else if (origin === "*") {
+            errorMsg =
+              "Error: Target origin for authentication response not specified correctly.";
+          }
+          if (statusMessageEl) statusMessageEl.textContent = errorMsg;
+          console.error(
+            "[OAuth Success Page] Authentication failed. Token:",
+            token,
+            "Origin:",
+            origin,
+          );
         }
       })();
     </script>

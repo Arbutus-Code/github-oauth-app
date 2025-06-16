@@ -45,7 +45,7 @@ export default async function authRoutes(server: FastifyInstance) {
       );
       reply.redirect(authorizationUrl);
     } catch (error: unknown) {
-      let errorMessage = "Failed to initiate authentication.";
+      const errorMessage = "Failed to initiate authentication.";
       if (error instanceof Error) {
         server.log.error(
           { error: error.message, stack: error.stack },

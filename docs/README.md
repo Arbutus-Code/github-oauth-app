@@ -74,33 +74,33 @@ Then, update the `.env` file with the following values:
 
   1. **Using OpenSSL (Recommended for command-line):**
 
-      ```bash
-      # Generates a 64-character hex string (32 bytes)
-      openssl rand -hex 32
-      
-      # For a stronger 128-character hex string (64 bytes):
-      # openssl rand -hex 64
-      ```
+     ```bash
+     # Generates a 64-character hex string (32 bytes)
+     openssl rand -hex 32
+
+     # For a stronger 128-character hex string (64 bytes):
+     # openssl rand -hex 64
+     ```
 
   2. **Using Node.js `crypto` module:**
 
-      Run this in your Node.js REPL or a script:
+     Run this in your Node.js REPL or a script:
 
-      ```javascript
-      // require('crypto').randomBytes(32).toString('hex');
-      // For 64 bytes:
-      // require('crypto').randomBytes(64).toString('hex');
-      ```
+     ```javascript
+     // require('crypto').randomBytes(32).toString('hex');
+     // For 64 bytes:
+     // require('crypto').randomBytes(64).toString('hex');
+     ```
 
-      To run directly in your terminal (if Node.js is installed):
+     To run directly in your terminal (if Node.js is installed):
 
-      ```bash
-      node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-      ```
+     ```bash
+     node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+     ```
 
   3. **Using a Password Manager:**
 
-      Most password managers have a built-in secure password generator. Configure it to generate a long string (e.g., 32-64 characters) with a mix of character types if possible, though a long hex string from the methods above is excellent.
+     Most password managers have a built-in secure password generator. Configure it to generate a long string (e.g., 32-64 characters) with a mix of character types if possible, though a long hex string from the methods above is excellent.
 
 - **`RATE_LIMIT_REQUESTS`**, **`RATE_LIMIT_WINDOW_MINUTES`**: Optional settings for rate limiting; defaults are usually fine.
 
